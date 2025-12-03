@@ -35,9 +35,7 @@ Permite mantener la configuración actualizada automáticamente desde Git.
    - **Repository URL**: `https://git.ictiberia.com/groales/vaultwarden`
    - **Repository reference**: `refs/heads/main`
    - **Compose path**: `docker-compose.yml`
-   - **Additional paths**: Elige según tu proxy:
-     - Para Traefik: `docker-compose.override.traefik.yml.example`
-     - Para NPM: `docker-compose.override.npm.yml.example`
+   - **Additional paths**: Solo para Traefik: `docker-compose.override.traefik.yml.example`
 
 5. En **Environment variables**, añade:
 
@@ -51,6 +49,8 @@ Permite mantener la configuración actualizada automáticamente desde Git.
    ```
    ADMIN_TOKEN=tu_token_admin_seguro_generado
    ```
+
+   ⚠️ **Nota para NPM**: No uses Additional paths, el docker-compose.yml base es suficiente.
 
 6. Haz clic en **Deploy the stack**
 
@@ -205,7 +205,8 @@ ADMIN_TOKEN=tu_token_admin_seguro_generado
 #### Opción B: Nginx Proxy Manager
 
 ```bash
-cp docker-compose.override.npm.yml.example docker-compose.override.yml
+# No necesitas override, usa directamente el base
+cp docker-compose.yml docker-compose.yml
 ```
 
 Crear archivo `.env`:
