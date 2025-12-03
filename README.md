@@ -22,6 +22,25 @@ Servidor de gestión de contraseñas compatible con Bitwarden, escrito en Rust. 
 
 ⚠️ **IMPORTANTE - Seguridad**: Vaultwarden requiere HTTPS en producción. Los clientes de Bitwarden no funcionarán correctamente con HTTP.
 
+## Generar ADMIN_TOKEN
+
+**Antes de cualquier despliegue**, es **crítico** generar un token en formato Argon2 seguro:
+
+```bash
+# 1. Generar un token aleatorio
+openssl rand -base64 48
+
+# 2. Convertirlo a formato Argon2 seguro
+docker run --rm -it vaultwarden/server:latest /vaultwarden hash
+# Pega el token generado arriba cuando lo solicite
+```
+
+Usa el **hash Argon2** resultante (empieza con `$argon2id$`) como valor de `ADMIN_TOKEN`.
+
+> ⚠️ **Importante**: No uses el token en texto plano, siempre usa el hash Argon2.
+
+---
+
 ## Despliegue con Portainer
 
 ### Opción A: Git Repository (Recomendada)
@@ -53,23 +72,6 @@ Permite mantener la configuración actualizada automáticamente desde Git.
    ⚠️ **Nota para NPM**: No uses Additional paths, el docker-compose.yml base es suficiente.
 
 6. Haz clic en **Deploy the stack**
-
-#### Generar ADMIN_TOKEN
-
-Es **crítico** generar un token en formato Argon2 seguro:
-
-```bash
-# Generar un token aleatorio
-openssl rand -base64 48
-
-# Convertirlo a formato Argon2 seguro
-docker run --rm -it vaultwarden/server:latest /vaultwarden hash
-# Pega el token generado arriba cuando lo solicite
-```
-
-Usa el hash Argon2 resultante (empieza con `$argon2id$`) como valor de `ADMIN_TOKEN`.
-
-> ⚠️ **Importante**: No uses el token en texto plano, siempre usa el hash Argon2.
 
 #### Configuración de WebSocket
 
@@ -217,28 +219,13 @@ cp .env.example .env
 
 ⚠️ No olvides habilitar **WebSocket Support** en la configuración del Proxy Host en NPM.
 
-### 3. Generar ADMIN_TOKEN
-
-```bash
-# 1. Generar token aleatorio
-openssl rand -base64 48
-
-# 2. Convertir a formato Argon2 seguro
-docker run --rm -it vaultwarden/server:latest /vaultwarden hash
-# Pega el token cuando lo solicite
-```
-
-Añade el **hash Argon2** resultante (empieza con `$argon2id$`) a tu archivo `.env`.
-
-> ⚠️ No uses el token en texto plano, siempre usa el hash Argon2.
-
-### 4. Iniciar el servicio
+### 3. Iniciar el servicio
 
 ```bash
 docker compose up -d
 ```
 
-### 5. Verificar el despliegue
+### 4. Verificar el despliegue
 
 ```bash
 docker compose logs -f vaultwarden
