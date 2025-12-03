@@ -1,0 +1,27 @@
+# docker-compose.override.npm.yml.example
+#
+# Este archivo configura Vaultwarden para usar Nginx Proxy Manager.
+#
+# Para usarlo:
+#   Desde Portainer (Git Repository):
+#     - Repository URL: https://git.ictiberia.com/groales/vaultwarden
+#     - Compose path: docker-compose.yml
+#     - Additional paths: docker-compose.override.npm.yml.example
+#     - Environment variables:
+#         DOMAIN=https://vaultwarden.tudominio.com
+#         ADMIN_TOKEN=tu_token_admin_seguro
+#         SIGNUPS_ALLOWED=false
+#
+#   Desde CLI:
+#     1. Copia este archivo a docker-compose.override.yml
+#     2. Crea archivo .env con las variables necesarias
+#
+# Docker Compose automáticamente fusiona docker-compose.yml + docker-compose.override.yml
+#
+# IMPORTANTE: En Nginx Proxy Manager debes:
+#   1. Crear un Proxy Host apuntando a vaultwarden:80
+#   2. HABILITAR "WebSocket Support" en la pestaña Advanced
+#   3. Configurar SSL con Let's Encrypt
+
+# No necesita labels adicionales para NPM
+# La red proxy ya está definida en docker-compose.yml

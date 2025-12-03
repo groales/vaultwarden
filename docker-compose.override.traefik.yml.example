@@ -1,0 +1,49 @@
+# docker-compose.override.traefik.yml.example
+#
+# Este archivo configura Vaultwarden para usar Traefik como reverse proxy.
+#
+# Para usarlo:
+#   Desde Portainer (Git Repository):
+#     - Repository URL: https://git.ictiberia.com/groales/vaultwarden
+#     - Compose path: docker-compose.yml
+#     - Additional paths: docker-compose.override.traefik.yml.example
+#     - Environment variables:
+#         DOMAIN=https://vaultwarden.tudominio.com
+#         DOMAIN_HOST=vaultwarden.tudominio.com
+#         ADMIN_TOKEN=tu_token_admin_seguro
+#         SIGNUPS_ALLOWED=false
+#
+#   Desde CLI:
+#     1. Copia este archivo a docker-compose.override.yml
+#     2. Crea archivo .env con las variables necesarias
+#
+# Docker Compose automáticamente fusiona docker-compose.yml + docker-compose.override.yml
+
+services:
+  vaultwarden:
+    labels:
+      # HTTP → HTTPS redirect
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden-http.rule=Host(`${DOMAIN_HOST}`)"
+      - "traefik.http.routers.vaultwarden-http.entrypoints=web"
+      - "traefik.http.routers.vaultwarden-http.middlewares=redirect-to-https@docker"
+      
+      # HTTPS router for main service
+      - "traefik.http.routers.vaultwarden.rule=Host(`${DOMAIN_HOST}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls=true"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.vaultwarden.service=vaultwarden-svc"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
+      
+      # WebSocket support for /notifications/hub
+      - "traefik.http.routers.vaultwarden-ws.rule=Host(`${DOMAIN_HOST}`) && Path(`/notifications/hub`)"
+      - "traefik.http.routers.vaultwarden-ws.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden-ws.tls=true"
+      - "traefik.http.routers.vaultwarden-ws.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.vaultwarden-ws.service=vaultwarden-ws-svc"
+      - "traefik.http.services.vaultwarden-ws-svc.loadbalancer.server.port=3012"
+      
+      # Redirect middleware
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"

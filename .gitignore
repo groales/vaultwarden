@@ -1,0 +1,21 @@
+# Docker Compose override files (keep only .example files)
+docker-compose.override.yml
+
+# Environment variables
+.env
+.env.local
+
+# Data directories
+data/
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/

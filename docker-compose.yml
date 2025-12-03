@@ -1,0 +1,25 @@
+services:
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN}
+      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false}
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      WEBSOCKET_ENABLED: true
+      LOG_FILE: /data/vaultwarden.log
+      LOG_LEVEL: warn
+      TZ: Europe/Madrid
+    volumes:
+      - vaultwarden_data:/data
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  vaultwarden_data:
+    driver: local
