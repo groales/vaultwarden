@@ -238,20 +238,13 @@ Visita `https://vaultwarden.tudominio.com/admin` e introduce tu `ADMIN_TOKEN`.
 
 ### 2. Configuración Recomendada
 
-En el panel de administración:
+En el panel de administración (`General Settings`):
 
-- **General Settings**:
-  - `Domain URL`: `https://vaultwarden.tudominio.com`
-  - `Require Email Verification`: Activar si tienes SMTP
-  - `Show password hints`: Desactivar por seguridad
-
-- **User Settings**:
-  - `Allow new signups`: `false` (salvo que lo necesites)
-  - `Invitation Organization Name`: Tu organización
-
-- **Advanced Settings**:
-  - `Enable WebSocket`: `true` (ya configurado)
-  - `Enable Admin Interface`: `true`
+- `Domain URL`: `https://vaultwarden.tudominio.com`
+- `Require Email Verification`: Activar si tienes SMTP
+- `Show password hints`: Desactivar por seguridad
+- `Allow new signups`: `false` (salvo que lo necesites)
+- `Invitation Organization Name`: Tu organización
 
 ### 3. Configurar SMTP (Opcional pero Recomendado)
 
