@@ -17,4 +17,4 @@ networks:
 
 volumes:
   vaultwarden_data:
-    driver: local
+    name: vaultwarden_data
