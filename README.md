@@ -194,24 +194,18 @@ cd vaultwarden
 
 ```bash
 cp docker-compose.override.traefik.yml.example docker-compose.override.yml
-```
-
-Crear archivo `.env`:
-```env
-DOMAIN_HOST=vaultwarden.tudominio.com
-ADMIN_TOKEN=tu_token_admin_seguro_generado
+cp .env.example .env
+# Editar .env y configurar DOMAIN_HOST y ADMIN_TOKEN
 ```
 
 #### Opción B: Nginx Proxy Manager
 
-```bash
-# No necesitas override, usa directamente el base
-cp docker-compose.yml docker-compose.yml
-```
+No necesitas archivo override, usa el `docker-compose.yml` base directamente.
 
-Crear archivo `.env`:
-```env
-ADMIN_TOKEN=tu_token_admin_seguro_generado
+Copiar y configurar `.env`:
+```bash
+cp .env.example .env
+# Editar .env y configurar ADMIN_TOKEN
 ```
 
 ⚠️ No olvides habilitar **WebSocket Support** en la configuración del Proxy Host en NPM.
