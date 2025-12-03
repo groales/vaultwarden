@@ -11,10 +11,10 @@ services:
     networks:
       - proxy
 
-networks:
-  proxy:
-    external: true
-
 volumes:
   vaultwarden_data:
     name: vaultwarden_data
+
+networks:
+  proxy:
+    external: true
