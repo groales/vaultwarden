@@ -8,9 +8,7 @@
 #     - Compose path: docker-compose.yml
 #     - Additional paths: docker-compose.override.npm.yml.example
 #     - Environment variables:
-#         DOMAIN=https://vaultwarden.tudominio.com
 #         ADMIN_TOKEN=tu_token_admin_seguro
-#         SIGNUPS_ALLOWED=false
 #
 #   Desde CLI:
 #     1. Copia este archivo a docker-compose.override.yml

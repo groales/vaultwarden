@@ -38,23 +38,18 @@ Permite mantener la configuración actualizada automáticamente desde Git.
    - **Additional paths**: Elige según tu proxy:
      - Para Traefik: `docker-compose.override.traefik.yml.example`
      - Para NPM: `docker-compose.override.npm.yml.example`
-     - Para Standalone: `docker-compose.override.standalone.yml.example` (⚠️ no recomendado)
 
 5. En **Environment variables**, añade:
 
-   **Para Traefik o NPM**:
+   **Para Traefik**:
    ```
-   DOMAIN=https://vaultwarden.tudominio.com
    DOMAIN_HOST=vaultwarden.tudominio.com
    ADMIN_TOKEN=tu_token_admin_seguro_generado
-   SIGNUPS_ALLOWED=false
    ```
 
-   **Para Standalone** (solo testing):
+   **Para NPM**:
    ```
-   DOMAIN=http://IP-DEL-SERVIDOR:8080
    ADMIN_TOKEN=tu_token_admin_seguro_generado
-   SIGNUPS_ALLOWED=false
    ```
 
 6. Haz clic en **Deploy the stack**
@@ -93,12 +88,7 @@ services:
     image: vaultwarden/server:latest
     restart: unless-stopped
     environment:
-      DOMAIN: ${DOMAIN}
-      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false}
       ADMIN_TOKEN: ${ADMIN_TOKEN}
-      WEBSOCKET_ENABLED: true
-      LOG_FILE: /data/vaultwarden.log
-      LOG_LEVEL: warn
       TZ: Europe/Madrid
     volumes:
       - vaultwarden_data:/data
@@ -142,10 +132,8 @@ volumes:
 
 **Variables de entorno necesarias**:
 ```
-DOMAIN=https://vaultwarden.tudominio.com
 DOMAIN_HOST=vaultwarden.tudominio.com
 ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
 ```
 
 </details>
@@ -160,12 +148,7 @@ services:
     image: vaultwarden/server:latest
     restart: unless-stopped
     environment:
-      DOMAIN: ${DOMAIN}
-      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false}
       ADMIN_TOKEN: ${ADMIN_TOKEN}
-      WEBSOCKET_ENABLED: true
-      LOG_FILE: /data/vaultwarden.log
-      LOG_LEVEL: warn
       TZ: Europe/Madrid
     volumes:
       - vaultwarden_data:/data
@@ -183,58 +166,13 @@ volumes:
 
 **Variables de entorno necesarias**:
 ```
-DOMAIN=https://vaultwarden.tudominio.com
 ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
 ```
 
 **⚠️ IMPORTANTE**: Debes configurar en NPM:
 1. Crea un Proxy Host apuntando a `vaultwarden:80`
 2. **Habilita "WebSocket Support"** en la pestaña Advanced
 3. Configura SSL con Let's Encrypt
-
-</details>
-
-<details>
-<summary>📋 Despliegue Standalone (Solo Testing)</summary>
-
-⚠️ **NO RECOMENDADO**: Vaultwarden requiere HTTPS para funcionar correctamente con los clientes oficiales de Bitwarden.
-
-```yaml
-services:
-  vaultwarden:
-    container_name: vaultwarden
-    image: vaultwarden/server:latest
-    restart: unless-stopped
-    environment:
-      DOMAIN: ${DOMAIN}
-      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false}
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
-      WEBSOCKET_ENABLED: true
-      LOG_FILE: /data/vaultwarden.log
-      LOG_LEVEL: warn
-      TZ: Europe/Madrid
-    volumes:
-      - vaultwarden_data:/data
-    ports:
-      - "8080:80"
-      - "3012:3012"
-
-volumes:
-  vaultwarden_data:
-    driver: local
-```
-
-**Variables de entorno necesarias**:
-```
-DOMAIN=http://IP-DEL-SERVIDOR:8080
-ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
-```
-
-**Acceso**: 
-- HTTP: `http://IP-DEL-SERVIDOR:8080`
-- WebSocket: `ws://IP-DEL-SERVIDOR:3012`
 
 </details>
 
@@ -260,10 +198,8 @@ cp docker-compose.override.traefik.yml.example docker-compose.override.yml
 
 Crear archivo `.env`:
 ```env
-DOMAIN=https://vaultwarden.tudominio.com
 DOMAIN_HOST=vaultwarden.tudominio.com
 ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
 ```
 
 #### Opción B: Nginx Proxy Manager
@@ -274,25 +210,10 @@ cp docker-compose.override.npm.yml.example docker-compose.override.yml
 
 Crear archivo `.env`:
 ```env
-DOMAIN=https://vaultwarden.tudominio.com
 ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
 ```
 
 ⚠️ No olvides habilitar **WebSocket Support** en la configuración del Proxy Host en NPM.
-
-#### Opción C: Standalone (solo testing)
-
-```bash
-cp docker-compose.override.standalone.yml.example docker-compose.override.yml
-```
-
-Crear archivo `.env`:
-```env
-DOMAIN=http://IP-DEL-SERVIDOR:8080
-ADMIN_TOKEN=tu_token_admin_seguro_generado
-SIGNUPS_ALLOWED=false
-```
 
 ### 3. Generar ADMIN_TOKEN
 
