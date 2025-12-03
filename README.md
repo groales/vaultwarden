@@ -121,13 +121,13 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
+volumes:
+  vaultwarden_data:
+    name: vaultwarden_data
+
 networks:
   proxy:
     external: true
-
-volumes:
-  vaultwarden_data:
-    driver: local
 ```
 
 **Variables de entorno necesarias**:
@@ -155,13 +155,13 @@ services:
     networks:
       - proxy
 
+volumes:
+  vaultwarden_data:
+    name: vaultwarden_data
+
 networks:
   proxy:
     external: true
-
-volumes:
-  vaultwarden_data:
-    driver: local
 ```
 
 **Variables de entorno necesarias**:
