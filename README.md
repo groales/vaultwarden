@@ -56,13 +56,20 @@ Permite mantener la configuración actualizada automáticamente desde Git.
 
 #### Generar ADMIN_TOKEN
 
-Es **crítico** generar un token fuerte para proteger el panel de administración:
+Es **crítico** generar un token en formato Argon2 seguro:
 
 ```bash
+# Generar un token aleatorio
 openssl rand -base64 48
+
+# Convertirlo a formato Argon2 seguro
+docker run --rm -it vaultwarden/server:latest /vaultwarden hash
+# Pega el token generado arriba cuando lo solicite
 ```
 
-O usa cualquier generador de contraseñas seguro con mínimo 32 caracteres.
+Usa el hash Argon2 resultante (empieza con `$argon2id$`) como valor de `ADMIN_TOKEN`.
+
+> ⚠️ **Importante**: No uses el token en texto plano, siempre usa el hash Argon2.
 
 #### Configuración de WebSocket
 
@@ -213,10 +220,17 @@ cp .env.example .env
 ### 3. Generar ADMIN_TOKEN
 
 ```bash
+# 1. Generar token aleatorio
 openssl rand -base64 48
+
+# 2. Convertir a formato Argon2 seguro
+docker run --rm -it vaultwarden/server:latest /vaultwarden hash
+# Pega el token cuando lo solicite
 ```
 
-Añade el resultado a tu archivo `.env`.
+Añade el **hash Argon2** resultante (empieza con `$argon2id$`) a tu archivo `.env`.
+
+> ⚠️ No uses el token en texto plano, siempre usa el hash Argon2.
 
 ### 4. Iniciar el servicio
 
@@ -413,10 +427,10 @@ docker compose logs vaultwarden | grep websocket
 # Verificar que la variable está configurada
 docker compose exec vaultwarden env | grep ADMIN_TOKEN
 
-# Regenerar token
-openssl rand -base64 48
+# Regenerar token en formato Argon2
+docker run --rm -it vaultwarden/server:latest /vaultwarden hash
 
-# Actualizar .env o variables de Portainer y redesplegar
+# Actualizar .env o variables de Portainer con el hash Argon2 y redesplegar
 ```
 
 ### Problemas de rendimiento
