@@ -37,7 +37,10 @@ docker run --rm -it vaultwarden/server:latest /vaultwarden hash
 
 Usa el **hash Argon2** resultante (empieza con `$argon2id$`) como valor de `ADMIN_TOKEN`.
 
-> ⚠️ **Importante**: No uses el token en texto plano, siempre usa el hash Argon2.
+> ⚠️ **Importante**: 
+> - No uses el token en texto plano, siempre usa el hash Argon2
+> - **Usa comillas simples** en el archivo `.env` para evitar que `$` se interprete como variable
+> - Ejemplo: `ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'`
 
 ---
 
