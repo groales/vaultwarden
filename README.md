@@ -116,7 +116,6 @@ services:
       # HTTPS router for main service
       - "traefik.http.routers.vaultwarden.rule=Host(`${DOMAIN_HOST}`)"
       - "traefik.http.routers.vaultwarden.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden.tls=true"
       - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vaultwarden.service=vaultwarden-svc"
       - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
@@ -124,7 +123,6 @@ services:
       # WebSocket support for /notifications/hub
       - "traefik.http.routers.vaultwarden-ws.rule=Host(`${DOMAIN_HOST}`) && Path(`/notifications/hub`)"
       - "traefik.http.routers.vaultwarden-ws.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden-ws.tls=true"
       - "traefik.http.routers.vaultwarden-ws.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vaultwarden-ws.service=vaultwarden-ws-svc"
       - "traefik.http.services.vaultwarden-ws-svc.loadbalancer.server.port=3012"
