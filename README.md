@@ -44,176 +44,114 @@ Usa el **hash Argon2** resultante (empieza con `$argon2id$`) como valor de `ADMI
 
 ---
 
-## Despliegue con Portainer
+## Despliegue con Docker Compose
 
-### Opción A: Git Repository (Recomendada)
-
-Permite mantener la configuración actualizada automáticamente desde Git.
-
-1. En Portainer, ve a **Stacks** → **Add stack**
-2. Nombra el stack: `vaultwarden`
-3. Selecciona **Git Repository**
-4. Configura:
-   - **Repository URL**: `https://git.ictiberia.com/groales/vaultwarden`
-   - **Repository reference**: `refs/heads/main`
-   - **Compose path**: `docker-compose.yml`
-   - **Additional paths**: Solo para Traefik: `docker-compose.override.traefik.yml.example`
-
-5. En **Environment variables**, añade:
-
-   **Para Traefik**:
-   ```
-   DOMAIN_HOST=vaultwarden.tudominio.com
-   ADMIN_TOKEN=tu_token_admin_seguro_generado
-   ```
-
-   **Para NPM**:
-   ```
-   ADMIN_TOKEN=tu_token_admin_seguro_generado
-   ```
-
-   ⚠️ **Nota para NPM**: No uses Additional paths, el docker-compose.yml base es suficiente.
-
-6. Haz clic en **Deploy the stack**
-
-#### Configuración de WebSocket
-
-- **Traefik**: Ya configurado en el override
-- **NPM**: Debes habilitar **WebSocket Support** en la configuración del Proxy Host desde la interfaz de NPM
-
-### Opción B: Web Editor
-
-Copia y pega el contenido consolidado según tu configuración de proxy.
-
-1. En Portainer, ve a **Stacks** → **Add stack**
-2. Nombra el stack: `vaultwarden`
-3. Selecciona **Web editor**
-4. Copia el contenido según tu entorno:
-
-<details>
-<summary>📋 Despliegue con Traefik</summary>
-
-```yaml
-services:
-  vaultwarden:
-    container_name: vaultwarden
-    image: vaultwarden/server:latest
-    restart: unless-stopped
-    environment:
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
-      TZ: Europe/Madrid
-    volumes:
-      - vaultwarden_data:/data
-    networks:
-      - proxy
-    labels:
-    labels:
-      - "traefik.enable=true"   
-      - "traefik.http.routers.vaultwarden.rule=Host(`${DOMAIN_HOST}`)"
-      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
-      - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
-
-volumes:
-  vaultwarden_data:
-    name: vaultwarden_data
-
-networks:
-  proxy:
-    external: true
-```
-
-**Variables de entorno necesarias**:
-```
-DOMAIN_HOST=vaultwarden.tudominio.com
-ADMIN_TOKEN=tu_token_admin_seguro_generado
-```
-
-</details>
-
-<details>
-<summary>📋 Despliegue con Nginx Proxy Manager</summary>
-
-```yaml
-services:
-  vaultwarden:
-    container_name: vaultwarden
-    image: vaultwarden/server:latest
-    restart: unless-stopped
-    environment:
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
-      TZ: Europe/Madrid
-    volumes:
-      - vaultwarden_data:/data
-    networks:
-      - proxy
-
-volumes:
-  vaultwarden_data:
-    name: vaultwarden_data
-
-networks:
-  proxy:
-    external: true
-```
-
-**Variables de entorno necesarias**:
-```
-ADMIN_TOKEN=tu_token_admin_seguro_generado
-```
-
-**⚠️ IMPORTANTE**: Debes configurar en NPM:
-1. Crea un Proxy Host apuntando a `vaultwarden:80`
-2. **Habilita "WebSocket Support"** en la pestaña Advanced
-3. Configura SSL con Let's Encrypt
-
-</details>
-
-5. En **Environment variables**, añade las variables correspondientes
-6. Haz clic en **Deploy the stack**
-
-## Despliegue con Docker CLI
-
-### 1. Clonar el repositorio
+### 1. Crear Directorio y Archivos
 
 ```bash
-git clone https://git.ictiberia.com/groales/vaultwarden.git
+# Crear directorio
+mkdir vaultwarden
 cd vaultwarden
 ```
 
-### 2. Elegir modo de despliegue
+### 2. Crear docker-compose.yml
 
-#### Opción A: Traefik
+Crea el archivo `docker-compose.yml`:
+
+```yaml
+services:
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      TZ: Europe/Madrid
+    volumes:
+      - vaultwarden_data:/data
+    networks:
+      - proxy
+
+volumes:
+  vaultwarden_data:
+    name: vaultwarden_data
+
+networks:
+  proxy:
+    external: true
+```
+
+### 3. Configurar Variables de Entorno
+
+Crea el archivo `.env`:
+
+**Para Traefik**:
+```env
+DOMAIN_HOST=vaultwarden.tudominio.com
+ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
+```
+
+**Para NPM**:
+```env
+ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
+```
+
+### 4. (Opcional) Configurar Traefik
+
+Si usas Traefik, crea `docker-compose.override.yml`:
+
+```yaml
+services:
+  vaultwarden:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vaultwarden.rule=Host(`${DOMAIN_HOST}`)
+      - traefik.http.routers.vaultwarden.entrypoints=websecure
+      - traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt
+      - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+```
+
+⚠️ **Importante para NPM**: Debes habilitar **WebSocket Support** en la configuración del Proxy Host desde la interfaz de NPM.
+
+### 5. Desplegar
 
 ```bash
+# Crear red proxy si no existe
+docker network create proxy
+
+# Iniciar servicios
+docker compose up -d
+
+# Ver logs
+docker compose logs -f vaultwarden
+```
+
+---
+
+## Método Alternativo: Clonar desde Git
+
+Si prefieres usar Git para mantener la configuración actualizada:
+
+```bash
+# Clonar repositorio
+git clone https://git.ictiberia.com/groales/vaultwarden.git
+cd vaultwarden
+
+# Copiar y editar variables
+cp .env.example .env
+nano .env
+
+# Para Traefik
 cp docker-compose.override.traefik.yml.example docker-compose.override.yml
-cp .env.example .env
-# Editar .env y configurar DOMAIN_HOST y ADMIN_TOKEN
-```
 
-#### Opción B: Nginx Proxy Manager
-
-No necesitas archivo override, usa el `docker-compose.yml` base directamente.
-
-Copiar y configurar `.env`:
-```bash
-cp .env.example .env
-# Editar .env y configurar ADMIN_TOKEN
-```
-
-⚠️ No olvides habilitar **WebSocket Support** en la configuración del Proxy Host en NPM.
-
-### 3. Iniciar el servicio
-
-```bash
+# Desplegar
+docker network create proxy
 docker compose up -d
 ```
 
-### 4. Verificar el despliegue
+---
 
-```bash
-docker compose logs -f vaultwarden
-```
+## Configuración Inicial
 
 ## Configuración Inicial
 
