@@ -69,16 +69,16 @@ services:
       TZ: Europe/Madrid
     volumes:
       - vaultwarden_data:/data
-    networks:
-      - proxy
 
 volumes:
   vaultwarden_data:
     name: vaultwarden_data
 
+# añadir estas líneas al final del archivo para proxy inverso 
 networks:
-  proxy:
+  default:
     external: true
+    name: proxy
 ```
 
 ### 3. Configurar Variables de Entorno
