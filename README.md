@@ -54,9 +54,9 @@ mkdir vaultwarden
 cd vaultwarden
 ```
 
-### 2. Crear docker-compose.yml
+### 2. Crear compose.yaml
 
-Crea el archivo `docker-compose.yml`:
+Crea el archivo `compose.yaml`:
 
 ```yaml
 services:
@@ -98,7 +98,7 @@ ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
 
 ### 4. (Opcional) Configurar Traefik
 
-Si usas Traefik, crea `docker-compose.override.yml`:
+Si usas Traefik, crea `compose.override.yaml`:
 
 ```yaml
 services:
@@ -142,7 +142,7 @@ cp .env.example .env
 nano .env
 
 # Para Traefik
-cp docker-compose.override.traefik.yml.example docker-compose.override.yml
+cp docker-compose.override.traefik.yml.example compose.override.yaml
 
 # Desplegar
 docker network create proxy

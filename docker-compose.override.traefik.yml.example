@@ -5,17 +5,17 @@
 # Para usarlo:
 #   Desde Portainer (Git Repository):
 #     - Repository URL: https://git.ictiberia.com/groales/vaultwarden
-#     - Compose path: docker-compose.yml
+#     - Compose path: compose.yaml
 #     - Additional paths: docker-compose.override.traefik.yml.example
 #     - Environment variables:
 #         DOMAIN_HOST=vaultwarden.tudominio.com
 #         ADMIN_TOKEN=tu_token_admin_seguro
 #
 #   Desde CLI:
-#     1. Copia este archivo a docker-compose.override.yml
+#     1. Copia este archivo a compose.override.yaml
 #     2. Crea archivo .env con las variables necesarias
 #
-# Docker Compose automáticamente fusiona docker-compose.yml + docker-compose.override.yml
+# Docker Compose automáticamente fusiona compose.yaml + compose.override.yaml
 
 services:
   vaultwarden:
