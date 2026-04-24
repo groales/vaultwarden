@@ -16,7 +16,6 @@ Servidor de gestión de contraseñas compatible con Bitwarden, escrito en Rust. 
 
 - Docker Engine instalado
 - Portainer configurado (recomendado)
-- **Para Traefik o NPM**: Red Docker `proxy` creada
 - **Dominio configurado**: Vaultwarden requiere HTTPS para funcionar correctamente
 - **ADMIN_TOKEN generado**: Token seguro para acceder al panel de administración
 
@@ -85,33 +84,23 @@ networks:
 
 Crea el archivo `.env`:
 
-**Para Traefik**:
 ```env
 DOMAIN_HOST=vaultwarden.tudominio.com
 ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
 ```
 
-**Para NPM**:
 ```env
 ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
 ```
 
-### 4. (Opcional) Configurar Traefik
 
-Si usas Traefik, crea `compose.override.yaml`:
 
 ```yaml
 services:
   vaultwarden:
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.vaultwarden.rule=Host(`${DOMAIN_HOST}`)
-      - traefik.http.routers.vaultwarden.entrypoints=websecure
-      - traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt
-      - traefik.http.services.vaultwarden.loadbalancer.server.port=80
 ```
 
-⚠️ **Importante para NPM**: Debes habilitar **WebSocket Support** en la configuración del Proxy Host desde la interfaz de NPM.
 
 ### 5. Desplegar
 
@@ -141,8 +130,6 @@ cd vaultwarden
 cp .env.example .env
 nano .env
 
-# Para Traefik
-cp docker-compose.override.traefik.yml.example compose.override.yaml
 
 # Desplegar
 docker network create proxy
@@ -208,9 +195,7 @@ Al crear cuenta o iniciar sesión:
 2. En **Server URL** introduce: `https://vaultwarden.tudominio.com`
 3. Inicia sesión con tu email y contraseña maestra
 
-## Integración con Traefik
 
-El archivo `docker-compose.override.traefik.yml.example` incluye:
 
 - ✅ Redirección automática HTTP → HTTPS
 - ✅ Certificados SSL con Let's Encrypt
@@ -219,14 +204,10 @@ El archivo `docker-compose.override.traefik.yml.example` incluye:
 
 Requiere:
 - Red Docker `proxy` existente
-- Traefik configurado con certificados Let's Encrypt
 - Variables: `DOMAIN` (con protocolo) y `DOMAIN_HOST` (solo dominio)
 
-## Integración con Nginx Proxy Manager
 
-El archivo `docker-compose.override.npm.yml.example` es minimalista.
 
-**Configuración en NPM**:
 
 1. **Proxy Hosts** → **Add Proxy Host**
 2. **Details**:
@@ -313,13 +294,11 @@ Docker Compose recreará automáticamente el contenedor con la nueva imagen mant
 
 **Soluciones**:
 
-**Para Traefik**:
 ```bash
 # Verificar que existen los routers de WebSocket
 docker compose logs vaultwarden | grep websocket
 ```
 
-**Para NPM**:
 1. Edita el Proxy Host
 2. Pestaña **Advanced**
 3. ✅ Activa **Websockets Support**

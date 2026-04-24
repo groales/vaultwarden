@@ -1,5 +1,4 @@
 # Docker Compose override files (keep only .example files)
-docker-compose.override.yml
 
 # Environment variables
 .env
