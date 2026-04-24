@@ -15,7 +15,6 @@ Servidor de gestión de contraseñas compatible con Bitwarden, escrito en Rust. 
 ## Requisitos Previos
 
 - Docker Engine instalado
-- Portainer configurado (recomendado)
 - **Dominio configurado**: Vaultwarden requiere HTTPS para funcionar correctamente
 - **ADMIN_TOKEN generado**: Token seguro para acceder al panel de administración
 
@@ -262,7 +261,6 @@ Considera usar una solución de backup automático como:
 
 ## Actualización
 
-### Desde Portainer (Git Repository)
 
 1. Ve a tu stack `vaultwarden`
 2. Haz clic en **Pull and redeploy**
@@ -318,7 +316,6 @@ docker compose exec vaultwarden env | grep ADMIN_TOKEN
 # Regenerar token en formato Argon2
 docker run --rm -it vaultwarden/server:latest /vaultwarden hash
 
-# Actualizar .env o variables de Portainer con el hash Argon2 y redesplegar
 ```
 
 ### Problemas de rendimiento
