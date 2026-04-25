@@ -12,11 +12,21 @@ Servidor de gestión de contraseñas compatible con Bitwarden, escrito en Rust. 
 - 👥 **Organizaciones**: Comparte contraseñas de forma segura con equipos
 - 🌐 **Autoalojado**: Control total sobre tus datos
 
+## Archivos de este Repositorio
+
+Este repositorio contiene:
+
+- `compose.yaml` - Stack de Vaultwarden
+- `.env.example` - Plantilla de variables de entorno
+- `README.md` - Esta documentación
+- `data/` - Persistencia local (se crea al arrancar)
+
 ## Requisitos Previos
 
 - Docker Engine instalado
 - **Dominio configurado**: Vaultwarden requiere HTTPS para funcionar correctamente
 - **ADMIN_TOKEN generado**: Token seguro para acceder al panel de administración
+- Red Docker externa `proxy` creada
 
 ⚠️ **IMPORTANTE - Seguridad**: Vaultwarden requiere HTTPS en producción. Los clientes de Bitwarden no funcionarán correctamente con HTTP.
 
@@ -52,56 +62,23 @@ mkdir vaultwarden
 cd vaultwarden
 ```
 
-### 2. Crear compose.yaml
+### 2. Preparar archivo .env
 
-Crea el archivo `compose.yaml`:
-
-```yaml
-services:
-  vaultwarden:
-    container_name: vaultwarden
-    image: vaultwarden/server:latest
-    restart: unless-stopped
-    environment:
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
-      TZ: Europe/Madrid
-    volumes:
-      - vaultwarden_data:/data
-
-volumes:
-  vaultwarden_data:
-    name: vaultwarden_data
-
-# añadir estas líneas al final del archivo para proxy inverso 
-networks:
-  default:
-    external: true
-    name: proxy
-```
-
-### 3. Configurar Variables de Entorno
+El archivo `compose.yaml` ya está configurado con bind mount local `./data`.
 
 Crea el archivo `.env`:
 
 ```env
-DOMAIN_HOST=vaultwarden.tudominio.com
 ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
 ```
 
-```env
-ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
+### 3. Crear red proxy
+
+```bash
+docker network create proxy
 ```
 
-
-
-```yaml
-services:
-  vaultwarden:
-    labels:
-```
-
-
-### 5. Desplegar
+### 4. Desplegar
 
 ```bash
 # Crear red proxy si no existe
@@ -129,9 +106,10 @@ cd vaultwarden
 cp .env.example .env
 nano .env
 
+# Crear red proxy si no existe
+docker network create proxy
 
 # Desplegar
-docker network create proxy
 docker compose up -d
 ```
 
@@ -140,7 +118,6 @@ docker compose up -d
 ## Configuración Inicial
 
 ## Configuración Inicial
-
 ### 1. Acceder al Panel de Administración
 
 Visita `https://vaultwarden.tudominio.com/admin` e introduce tu `ADMIN_TOKEN`.
@@ -225,29 +202,16 @@ Requiere:
 ### Backup Manual
 
 ```bash
-# Detener el contenedor
-docker compose stop vaultwarden
-
-# Backup del volumen
-docker run --rm -v vaultwarden_data:/data -v $(pwd):/backup alpine \
-  tar czf /backup/vaultwarden-backup-$(date +%Y%m%d).tar.gz -C /data .
-
-# Reiniciar el contenedor
-docker compose start vaultwarden
+# Backup simple del directorio local
+tar czf vaultwarden-backup-$(date +%Y%m%d).tar.gz ./data/
 ```
 
 ### Restauración
 
 ```bash
-# Detener el contenedor
-docker compose stop vaultwarden
-
-# Restaurar desde backup
-docker run --rm -v vaultwarden_data:/data -v $(pwd):/backup alpine \
-  sh -c "cd /data && tar xzf /backup/vaultwarden-backup-20240101.tar.gz"
-
-# Reiniciar el contenedor
-docker compose start vaultwarden
+# Restaurar backup
+tar xzf vaultwarden-backup-YYYYMMDD.tar.gz -C ./
+docker compose restart vaultwarden
 ```
 
 ### Backup Automático

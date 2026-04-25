@@ -7,11 +7,7 @@ services:
       ADMIN_TOKEN: ${ADMIN_TOKEN}
       TZ: Europe/Madrid
     volumes:
-      - vaultwarden_data:/data
-
-volumes:
-  vaultwarden_data:
-    name: vaultwarden_data
+      - ./data:/data
 
 # añadir estas líneas al final del archivo para proxy inverso 
 networks:
