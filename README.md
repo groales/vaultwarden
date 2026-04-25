@@ -28,6 +28,8 @@ Este repositorio contiene:
 - **ADMIN_TOKEN generado**: Token seguro para acceder al panel de administración
 - Red Docker externa `proxy` creada
 
+Este stack no publica puertos en el host. Vaultwarden queda accesible a traves de la red Docker `proxy` y debe exponerse mediante un proxy inverso.
+
 ⚠️ **IMPORTANTE - Seguridad**: Vaultwarden requiere HTTPS en producción. Los clientes de Bitwarden no funcionarán correctamente con HTTP.
 
 ## Generar ADMIN_TOKEN
@@ -50,6 +52,27 @@ Usa el **hash Argon2** resultante (empieza con `$argon2id$`) como valor de `ADMI
 > - **Usa comillas simples** en el archivo `.env` para evitar que `$` se interprete como variable
 > - Ejemplo: `ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'`
 
+## compose.yaml actual
+
+```yaml
+services:
+   vaultwarden:
+      container_name: vaultwarden
+      image: vaultwarden/server:latest
+      user: "1000:1000"
+      restart: unless-stopped
+      environment:
+         ADMIN_TOKEN: ${ADMIN_TOKEN}
+         TZ: Europe/Madrid
+      volumes:
+         - ./data:/data
+
+networks:
+   default:
+      external: true
+      name: proxy
+```
+
 ---
 
 ## Despliegue con Docker Compose
@@ -66,7 +89,20 @@ cd vaultwarden
 
 El archivo `compose.yaml` ya está configurado con bind mount local `./data`.
 
-Crea el archivo `.env`:
+Antes de arrancar el contenedor, crea el directorio de datos y ajusta permisos para el UID/GID configurado en el compose (`1000:1000`):
+
+```bash
+mkdir -p data
+chown -R 1000:1000 data
+```
+
+Copia la plantilla `.env.example` a `.env` y edita el valor de `ADMIN_TOKEN`:
+
+```bash
+cp .env.example .env
+```
+
+Contenido esperado:
 
 ```env
 ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$...'  # Tu hash Argon2
@@ -99,7 +135,7 @@ Si prefieres usar Git para mantener la configuración actualizada:
 
 ```bash
 # Clonar repositorio
-git clone https://git.ictiberia.com/groales/vaultwarden.git
+git clone https://github.com/groales/vaultwarden.git
 cd vaultwarden
 
 # Copiar y editar variables
@@ -116,7 +152,6 @@ docker compose up -d
 ---
 
 ## Configuración Inicial
-
 ## Configuración Inicial
 ### 1. Acceder al Panel de Administración
 
@@ -171,19 +206,12 @@ Al crear cuenta o iniciar sesión:
 2. En **Server URL** introduce: `https://vaultwarden.tudominio.com`
 3. Inicia sesión con tu email y contraseña maestra
 
-
+## Proxy Inverso
 
 - ✅ Redirección automática HTTP → HTTPS
 - ✅ Certificados SSL con Let's Encrypt
 - ✅ Soporte completo para WebSocket (`/notifications/hub`)
 - ✅ Headers de seguridad
-
-Requiere:
-- Red Docker `proxy` existente
-- Variables: `DOMAIN` (con protocolo) y `DOMAIN_HOST` (solo dominio)
-
-
-
 
 1. **Proxy Hosts** → **Add Proxy Host**
 2. **Details**:
@@ -247,8 +275,8 @@ Docker Compose recreará automáticamente el contenedor con la nueva imagen mant
 **Soluciones**:
 1. Verifica que usas HTTPS (los clientes requieren conexión segura)
 2. Comprueba que el certificado SSL es válido
-3. Revisa que la variable `DOMAIN` incluye el protocolo completo
-4. Verifica acceso desde navegador: `https://vaultwarden.tudominio.com`
+3. Verifica acceso desde navegador: `https://vaultwarden.tudominio.com`
+4. Comprueba que el proxy inverso apunta al contenedor `vaultwarden` por la red `proxy`
 
 ### WebSocket no funciona
 
@@ -264,9 +292,6 @@ docker compose logs vaultwarden | grep websocket
 1. Edita el Proxy Host
 2. Pestaña **Advanced**
 3. ✅ Activa **Websockets Support**
-
-**Para Standalone**:
-- Verifica que el puerto 3012 está publicado y accesible
 
 ### Error de ADMIN_TOKEN
 
