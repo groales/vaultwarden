@@ -152,7 +152,6 @@ docker compose up -d
 ---
 
 ## Configuración Inicial
-## Configuración Inicial
 ### 1. Acceder al Panel de Administración
 
 Visita `https://vaultwarden.tudominio.com/admin` e introduce tu `ADMIN_TOKEN`.
