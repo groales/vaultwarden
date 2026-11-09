@@ -1,0 +1,13 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    user: "${PUID:-1000}:${PGID:-1000}"
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-http://localhost:8000}
+      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-true}
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:8000:80"
