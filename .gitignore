@@ -1,0 +1,13 @@
+# Configuración local y secretos
+.env
+
+# Datos persistentes, base de datos, adjuntos y copias
+/data/
+/data
+
+# Archivos locales de macOS
+.DS_Store
+
+# Copias de seguridad locales
+*.bak
+*.backup

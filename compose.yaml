@@ -1,0 +1,12 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-http://localhost:8080}
+      SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-true}
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:${VAULTWARDEN_PORT:-8080}:80"
