@@ -17,8 +17,12 @@ Vaultwarden no es el servidor oficial de Bitwarden ni está afiliado a Bitwarden
 
 - Docker Engine o Docker Desktop con Docker Compose.
 - El servicio escucha en el puerto `80` dentro del contenedor.
-- Por defecto, el host publica `127.0.0.1:8081`; abre <http://localhost:8081> en este equipo.
-- Para uso desde otros equipos o clientes, configura un dominio HTTPS y un proxy inverso. No expongas directamente el puerto HTTP a Internet: el Web Vault requiere HTTPS para funcionar de forma segura.
+- El proceso usa UID:GID definidos por `PUID` y `PGID` (por defecto, `1000:1000`).
+- El host publica `127.0.0.1:8000` (fijo en `compose.yaml`); abre <http://localhost:8000> en este equipo. Ese puerto debe estar libre.
+- Para uso desde otros equipos o clientes, configura un dominio HTTPS y un proxy inverso. No expongas directamente el puerto HTTP a Internet: 
+
+
+> El Web Vault requiere HTTPS para funcionar de forma segura.
 
 ## Despliegue clonando con Git
 
@@ -30,7 +34,7 @@ cd vaultwarden
 cp .env.example .env
 ```
 
-Edita `.env` con el dominio HTTPS y los valores apropiados para ese servidor. No compartas `.env` ni lo incluyas en Git. Si publicas el repositorio, hazlo solo después de configurar tú mismo el remoto; este proyecto no incluye un remoto.
+Edita `.env` con el dominio HTTPS, `PUID`, `PGID` y los valores apropiados para ese servidor. No compartas `.env` ni lo incluyas en Git. Si publicas el repositorio, hazlo solo después de configurar tú mismo el remoto; este proyecto no incluye un remoto.
 
 ## Despliegue manual sin Git
 
@@ -51,13 +55,15 @@ Compose carga `.env` automáticamente para interpolar las variables usadas en `c
 
 | Variable | Valor inicial | Función |
 | --- | --- | --- |
-| `DOMAIN` | `http://localhost:8081` | URL canónica del servicio; para acceso externo debe ser la URL pública HTTPS. |
-| `VAULTWARDEN_PORT` | `8081` | Puerto del host, enlazado solo a `127.0.0.1`. |
+| `PUID` | `1000` | UID numérico con el que se ejecuta el proceso dentro del contenedor. |
+| `PGID` | `1000` | GID numérico con el que se ejecuta el proceso dentro del contenedor. |
+| `DOMAIN` | `http://localhost:8000` | URL canónica del servicio; para acceso externo debe ser la URL pública HTTPS. |
 | `SIGNUPS_ALLOWED` | `true` | Permite registros iniciales; desactívalo tras crear las cuentas necesarias. |
 
 ## Persistencia y operación
 
 - `./data:/data` conserva la base de datos SQLite, adjuntos y demás estado del servicio fuera del contenedor. La carpeta `data/` se excluye de Git.
+- El contenedor usa UID:GID `${PUID}:${PGID}`; ajusta `PUID` y `PGID` en `.env` según corresponda y asegúrate de que ese usuario pueda escribir en `data/` en el sistema anfitrión antes de iniciar Vaultwarden.
 - Estado: `docker compose ps`
 - Registros: `docker compose logs -f vaultwarden`
 - Aplicar cambios de configuración: `docker compose up -d`
@@ -69,7 +75,7 @@ Haz copias de seguridad periódicas de `data/` y comprueba que se pueden restaur
 
 ## Seguridad
 
-- Este despliegue queda limitado al propio equipo mediante `127.0.0.1`; configura un proxy inverso con TLS antes de habilitar acceso por red.
+- Este despliegue queda limitado al propio equipo mediante `127.0.0.1:8000`; configura un proxy inverso con TLS antes de habilitar acceso por red.
 - Configura `DOMAIN` con la URL HTTPS real detrás del proxy, siguiendo sus ejemplos oficiales.
 - Deshabilita `SIGNUPS_ALLOWED` después del alta inicial y mantén la imagen actualizada.
 - Protege las copias de seguridad y restringe permisos de acceso a `data/`; esa carpeta contiene información sensible.
